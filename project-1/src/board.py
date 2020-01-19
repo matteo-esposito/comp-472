@@ -8,9 +8,11 @@ class Board:
         y_coord = ord(move[0]) - 65
         x_coord = int(move[1]) - 1
 
-        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
+        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
             try:
-                self.grid[y][x] %= 1
+                if x < 0 or y < 0 or x > n or y > n:
+                    raise IndexError
+                self.grid[y][x] ^= 1
             except IndexError:
                 continue
 
