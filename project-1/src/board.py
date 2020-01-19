@@ -9,8 +9,7 @@ class Board:
         x_coord = int(move[1]) - 1
         n = len(self.grid)
 
-        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), 
-        (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
+        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
             try:
                 if x < 0 or y < 0 or x >= n or y >= n:
                     raise IndexError
