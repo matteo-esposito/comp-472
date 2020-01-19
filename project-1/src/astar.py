@@ -1,4 +1,4 @@
-from parser import parse, testfile
+from input_parser import parse, testfile
 
 def astar():
     pass
