@@ -7,10 +7,11 @@ class Board:
         # move must be in the form A1,...,D4,etc
         y_coord = ord(move[0]) - 65
         x_coord = int(move[1]) - 1
+        n = len(self.grid)
 
         for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
             try:
-                if x < 0 or y < 0 or x > n or y > n:
+                if x < 0 or y < 0 or x >= n or y >= n:
                     raise IndexError
                 self.grid[y][x] ^= 1
             except IndexError:
