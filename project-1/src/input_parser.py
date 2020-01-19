@@ -1,5 +1,7 @@
 # Let test file be importable
 testfile = "test-cases-and-solutions/test.txt"
+# testfile = "src/test-cases-and-solutions/test.txt"
+
 
 def parse(filepath):
     """
