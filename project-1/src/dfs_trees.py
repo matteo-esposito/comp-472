@@ -2,6 +2,7 @@ from input_parser import parse, testfile
 import copy
 import time
 
+
 class Board:
     
     def __init__(self, grid):
@@ -16,11 +17,12 @@ class Board:
         # Don't modify inplace
         temp_grid = copy.deepcopy(self.grid)
 
-        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
+        for y, x in [(y_coord - 1, x_coord), (y_coord + 1, x_coord), 
+                     (y_coord, x_coord), (y_coord, x_coord - 1), (y_coord, x_coord + 1)]:
             try:
                 if x < 0 or y < 0 or x >= n or y >= n:
                     raise IndexError
-                temp_grid[y][x] ^= 1
+                temp_grid[y][x] ^= 1 # Flip from black to white or vice versa.
             except IndexError:
                 continue
                 
@@ -44,6 +46,11 @@ class Node:
         self.move = move
         self.state = state
         self.children = []
+        self.parent = None
+    
+    def assign_parent(self):
+        for child in self.children:
+            child.parent = self
         
     def add_child(self, new_node):
         self.children.append(new_node)
@@ -92,10 +99,14 @@ def dfs_tree(n, max_d, max_l, puzzle):
     # Start timer
     s = time.time()
     
+    # Make use of n (processing using n is used in parse())
+    assert n == len(puzzle)
+    
     # Initialize
     alpha = list(map(chr, range(ord('A'), ord('Z')+1))) # alphabet
     n = len(puzzle)
     
+    # 
     print("===== Initial State =====")
     root = Node("0", Board(puzzle))
     print(root, "\n=========================")
@@ -110,34 +121,58 @@ def dfs_tree(n, max_d, max_l, puzzle):
 
         # Set current puzzle
         current_puzzle = open_l[0]
-        if current_puzzle.get_depth(root) > max_d:
+        d = current_puzzle.get_depth(root)
+
+        if d > max_d:
             break
 
         # Goal found
         if current_puzzle.state.goal_test():
             print("Solved in {}s".format(str(round(time.time()-s, 6))))
+            intermediate_puzzle = current_puzzle
+
+            while True:
+                final_path.append(intermediate_puzzle.move) # Store the move that led us to solution
+                intermediate_puzzle = intermediate_puzzle.parent # Move up the tree and repeat until we hit root.
+                if not intermediate_puzzle.parent:
+                    final_path.append("0")
+                    break
+                
+            # Outputs
+            print(f"Path to solution: {final_path[::-1]}")
             return root, current_puzzle.state.print_grid()
         else:
             # Generate children
             for y in alpha[:n]:
                 for x in range(1,27)[:n]:
-                    # Make move and append new child node to parent.
+                    
+                    # Make move, create child Node (includes move and board) and append this new node to parent.
                     move = y + str(x)
                     new_state = current_puzzle.state.touch(move)
                     child = Node(move, Board(new_state))
-                    current_puzzle.add_child(child)
+                    
+                    # Assign parent
+                    current_puzzle.assign_parent()
                     
                     # Check if child has been visited or not
                     if not already_seen(child, open_l) or not already_seen(child, closed_l):
                         open_l.append(child)
+                        current_puzzle.add_child(child)
             
             # Put leftmost_puzzle from open to closed
             closed_l.append(open_l.pop(0))
-            
+    
     # If all fails, print no solution.
-    print("\nNo solution")
+    print(f"\nNo solution after depth {d-1}")
     return None, None
 
+
 if __name__ == '__main__':
-    for args in parse(testfile):
-        solved_root, _ = dfs_tree(*args)
+
+    # Testing
+    grid = [[1, 1], [1, 0]]
+    solved, _ = dfs_tree(2, 3, 0, grid)
+
+    # Prod
+    # for args in parse(testfile):
+    #     solved_root, _ = dfs_tree(*args)
