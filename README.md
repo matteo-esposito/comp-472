@@ -1,19 +1,26 @@
+https://github.com/matteo-esposito/comp-472
 # COMP 472 | Artificial Intelligence, Winter 2020
 
 ## Project 1: Indonesian Dot Puzzle
 
-### Files
+### Deliverable 1 (Feb 9)
 
-`input_parser.py`
-- File holding the input parsing function to be used in all algorithm implementation files
+#### Usage (DFS)
+1. Clone this repository and enter the `/src` directory.
 
-`board.py`, `node.py`
-- Board and Node classes to be used in search algorithms.
+```bash
+git clone https://github.com/matteo-esposito/comp-472.git
+cd comp-472/project-1/src/
+```
 
-`bfs.py`, `dfs.py`, `astar.py`
-- Search algorithm scripts.
+2. Run `dfs.py`
 
-### Usage (DFS)
 ```python
 python dfs.py
 ```
+
+The expected console output should look like:
+
+![](project-1/src/assets/dfs.png)
+
+3. Validate output in `/out` directory.
