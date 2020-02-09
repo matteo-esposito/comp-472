@@ -1,7 +1,11 @@
-import os, sys, copy, time
+import os
+import shutil
+import time
+
+from board import Board
 from input_parser import parse, testfile, collapse_list
 from node import Node
-from board import Board
+
 
 def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
     """Recursive implementation of depth limited search.
@@ -22,8 +26,9 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
 
         # Populate dict of moves and states to solution.
         while True:
-            final_path.append({intermediate_puzzle.move: intermediate_puzzle.state.grid}) # Store the move that led us to solution
-            intermediate_puzzle = intermediate_puzzle.parent # Move up the tree and repeat until we hit root.
+            final_path.append(
+                {intermediate_puzzle.move: intermediate_puzzle.state.grid})  # Store the move that led us to solution
+            intermediate_puzzle = intermediate_puzzle.parent  # Move up the tree and repeat until we hit root.
 
             # When we hit root, i.e. None parent, add "0" to final path.
             if not intermediate_puzzle.parent:
@@ -61,18 +66,19 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
 
             # Decrement max_d on each recursive call.
             result = recursive_dls(n, max_d - 1, max_l, child_node, puzzle_number)
-            
+
             # Check if we have hit no sol (failure) or max depth with no sol (cutoff)
             if max_depth_hit(result):
                 hit_max_depth = True
             else:
-                return result 
-            
-        # Check if hit max or failed search for each child in the generated child states.
+                return result
+
+                # Check if hit max or failed search for each child in the generated child states.
         if hit_max_depth:
-            return "1" # Backtrack
+            return "1"  # Backtrack
         else:
-            return [] # Continue
+            return []  # Continue
+
 
 def max_depth_hit(result):
     """Check if the search yielded no solution due to having hit the max depth.
@@ -93,11 +99,12 @@ def write_starting_state(start_node, puzzle_version):
         start_node {Node} -- start node of the problem.
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
     """
-    fname = f"out/{version}_dfs_search.txt"
-    with open(fname, "a+") as f:
+    fname = f"out/{puzzle_version}_dfs_search.txt"
+    with open(fname, "w+") as f:
         f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(start_node.state.grid)))
         f.close()
-    return 
+    return
+
 
 def write_no_solution(result, puzzle_version):
     """Write to solution file "no solution" in the case that dfs never yields a solution.
@@ -107,25 +114,33 @@ def write_no_solution(result, puzzle_version):
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
     """
     if result == "1":
-        with open(f"out/{puzzle_version}_dfs_solution.txt", 'w') as f:
+        with open(f"out/{puzzle_version}_dfs_solution.txt", 'w+') as f:
             f.write("no solution")
             f.close()
     return
 
 
 if __name__ == '__main__':
-    
+
+    # If folder exists, delete it and create a new version (clear old output)
+    desired_folder_path = os.path.join(os.getcwd(), "out/")
+    if os.path.isdir(desired_folder_path):
+        shutil.rmtree(desired_folder_path, ignore_errors=True)
+    os.mkdir(desired_folder_path)
+
     # Run search and output to text files.
     for version, case_args in enumerate(parse(testfile)):
-        
+
         # Write initial setup to search file.
         initial_node = Node("0", Board(case_args[3]))
         write_starting_state(initial_node, version)
-        
+
         # Run dfs timed.
         s = time.time()
         res = recursive_dls(*case_args[:3], initial_node, version)
-        print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
+        print(
+            f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
 
         # Write out "no solution" in the case where we return a failed search.
         write_no_solution(res, version)
+        print("ok")
