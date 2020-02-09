@@ -4,16 +4,16 @@
 
 ### Files
 
-`parser.py`
+`input_parser.py`
 - File holding the input parsing function to be used in all algorithm implementation files
+
+`board.py`, `node.py`
+- Board and Node classes to be used in search algorithms.
 
 `bfs.py`, `dfs.py`, `astar.py`
 - Search algorithm scripts.
 
-`main.py`
-- Run any of the above algorithms in this file.
-
-### Usage
+### Usage (DFS)
 ```python
-python main.py
+python dfs.py
 ```
