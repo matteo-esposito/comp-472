@@ -31,7 +31,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
                 break
 
         # Output path and grid.
-        with open(f"project-1/src/out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
 
             for pair in final_path[::-1]:
                 for move, grid in pair.items():
@@ -54,7 +54,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
         for child_node in child_states:
 
             # Print node that is being visited at the moment (write if file doesnt exist, append if it does.)
-            fname = f"project-1/src/out/{puzzle_number}_dfs_search.txt"
+            fname = f"out/{puzzle_number}_dfs_search.txt"
             with open(fname, "a+") as f:
                 f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(child_node.state.grid)))
                 f.close()
@@ -68,38 +68,64 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
             else:
                 return result 
             
-        # Check if hit max or failed search
+        # Check if hit max or failed search for each child in the generated child states.
         if hit_max_depth:
-            return "1"
+            return "1" # Backtrack
         else:
-            return []
+            return [] # Continue
 
 def max_depth_hit(result):
-    """
-    Check if search ended because hit max.
+    """Check if the search yielded no solution due to having hit the max depth.
+    
+    Arguments:
+        result {str, list} -- Result of search.
+    
+    Returns:
+        bool -- Has max depth been hit.
     """
     return (len(result) == 1) and (result[0] == "1")
+
+
+def write_starting_state(start_node, puzzle_version):
+    """Write out starting state in search text file.
+    
+    Arguments:
+        start_node {Node} -- start node of the problem.
+        puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
+    """
+    fname = f"out/{version}_dfs_search.txt"
+    with open(fname, "a+") as f:
+        f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(start_node.state.grid)))
+        f.close()
+    return 
+
+def write_no_solution(result, puzzle_version):
+    """Write to solution file "no solution" in the case that dfs never yields a solution.
+    
+    Arguments:
+        result {dict or str} -- If result == "1", we know we didn't reach a solution and this method will run.
+        puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
+    """
+    if result == "1":
+        with open(f"out/{puzzle_version}_dfs_solution.txt", 'w') as f:
+            f.write("no solution")
+            f.close()
+    return
 
 
 if __name__ == '__main__':
     
     # Run search and output to text files.
-    for puzzle_version, case_args in enumerate(parse(testfile)):
+    for version, case_args in enumerate(parse(testfile)):
         
         # Write initial setup to search file.
         initial_node = Node("0", Board(case_args[3]))
-        fname = f"project-1/src/out/{puzzle_version}_dfs_search.txt"
-        with open(fname, "a+") as f:
-            f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(initial_node.state.grid)))
-            f.close()
+        write_starting_state(initial_node, version)
         
-        # Run dfs
+        # Run dfs timed.
         s = time.time()
-        res = recursive_dls(*case_args[:3], initial_node, puzzle_version)
-        print(f"Time elapsed for puzzle {puzzle_version}: {str(round(time.time() - s, 4))}s.")
+        res = recursive_dls(*case_args[:3], initial_node, version)
+        print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
 
         # Write out "no solution" in the case where we return a failed search.
-        if res == 1:
-            with open(f"project-1/src/out/{puzzle_number}_dfs_solution.txt", 'w') as f:
-                f.write("no solution")
-                f.close()
+        write_no_solution(res, version)
