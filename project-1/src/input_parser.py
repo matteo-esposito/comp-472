@@ -1,5 +1,5 @@
 # Let test file be importable
-testfile = "test-cases-and-solutions/test.txt"
+testfile = "project-1/src/test-cases-and-solutions/test.txt"
 
 def collapse_list(nl):
     """
@@ -55,10 +55,7 @@ def parse(filepath):
 
         # Append first 3 entries
         for entry in l[:3]:
-            if entry == l[1]:
-                inner_list.append(int(entry)-1)
-            else:
-                inner_list.append(int(entry))
+            inner_list.append(int(entry))
 
         # Deal with 4th entry (turn into int grid row and append to inner_list)
         grid_size = inner_list[0]

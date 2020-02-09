@@ -1,4 +1,4 @@
-import os, sys, copy
+import os, sys, copy, time
 from input_parser import parse, testfile, collapse_list
 from node import Node
 from board import Board
@@ -31,7 +31,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
                 break
 
         # Output path and grid.
-        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+        with open(f"project-1/src/out/{puzzle_number}_dfs_solution.txt", 'w') as f:
 
             for pair in final_path[::-1]:
                 for move, grid in pair.items():
@@ -41,10 +41,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
         return final_path
 
     # Hit max depth and didn't reach solution.
-    elif max_d == 0:
-        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
-            f.write("no solution")
-            f.close()
+    elif max_d == 1:
         return "1"
 
     # Continue recursive calls of dfs limited depth.
@@ -57,7 +54,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
         for child_node in child_states:
 
             # Print node that is being visited at the moment (write if file doesnt exist, append if it does.)
-            fname = f"out/{puzzle_number}_dfs_search.txt"
+            fname = f"project-1/src/out/{puzzle_number}_dfs_search.txt"
             with open(fname, "a+") as f:
                 f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(child_node.state.grid)))
                 f.close()
@@ -91,10 +88,18 @@ if __name__ == '__main__':
         
         # Write initial setup to search file.
         initial_node = Node("0", Board(case_args[3]))
-        fname = f"out/{puzzle_version}_dfs_search.txt"
+        fname = f"project-1/src/out/{puzzle_version}_dfs_search.txt"
         with open(fname, "a+") as f:
             f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(initial_node.state.grid)))
             f.close()
         
         # Run dfs
-        recursive_dls(*case_args[:3], initial_node, puzzle_version)
+        s = time.time()
+        res = recursive_dls(*case_args[:3], initial_node, puzzle_version)
+        print(f"Time elapsed for puzzle {puzzle_version}: {str(round(time.time() - s, 4))}s.")
+
+        # Write out "no solution" in the case where we return a failed search.
+        if res == 1:
+            with open(f"project-1/src/out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+                f.write("no solution")
+                f.close()
