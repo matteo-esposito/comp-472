@@ -1,61 +1,100 @@
-# For pycharm
-# from src.input_parser import parse, testfile
-# from src.board import Board
-from input_parser import parse, testfile
+import os, sys, copy
+from input_parser import parse, testfile, collapse_list
+from node import Node
 from board import Board
-import copy
-import time
 
-def already_seen(g, group):
-    for game in group:
-        if g.grid == game.grid:
-            return True
-    return False
-
-def dfs(n, max_d, max_l, puzzle):
-    """Implementation of slide 29 in 472-2-search-Winter2020.pdf
+def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
+    """Recursive implementation of depth limited search.
     
-    Notes:
-        - ignore max_l for dfs
+    Arguments:
+        n {int} -- size of grid (i.e. 2x2 = 2, 3x3 = 3)
+        max_d {int} -- max depth
+        max_l {int} -- N/A
+        current_puzzle {Board} -- Board object that represents the starting puzzle grid
+        puzzle_number {int} -- index variable for output filenames
     """
-    # Start timer
-    s = time.time()
-    
-    # Initialize
-    problem_grid = puzzle.copy()
-    open_l = [Board(problem_grid)] # List of board objects
-    closed_l = []
-    alpha = list(map(chr, range(ord('A'), ord('Z')+1))) # alphabet
-    n = len(puzzle)
-    moves = [] # TBU   
-    
-    print("Start:")
-    open_l[0].print_grid()
-    
-    # Limited-depth depth first search algorithm
-    while len(open_l) != 0:
-        current_puzzle = open_l[0]
+    # Solution reached. Return path and solved grid.
+    if current_puzzle.state.goal_test():
 
-        # Goal found
-        if current_puzzle.goal_test():
-            print(f"Done @ {time.time()-s}")
-            return current_puzzle.print_grid()
-        else:
-            # Generate kids
-            for y in alpha[:n]:
-                for x in range(1,27)[:n]:
-                    # Reset puzzle
-                    parent_puzzle = Board(copy.deepcopy(open_l[0].grid)) 
-                    parent_puzzle.touch(y + str(x))
-                    child = parent_puzzle
-                    if not already_seen(child, open_l) or not already_seen(child, closed_l):
-                        open_l.append(child)
+        # Create path to solution
+        intermediate_puzzle = current_puzzle
+        final_path = []
+
+        # Populate dict of moves and states to solution.
+        while True:
+            final_path.append({intermediate_puzzle.move: intermediate_puzzle.state.grid}) # Store the move that led us to solution
+            intermediate_puzzle = intermediate_puzzle.parent # Move up the tree and repeat until we hit root.
+
+            # When we hit root, i.e. None parent, add "0" to final path.
+            if not intermediate_puzzle.parent:
+                final_path.append({"0": intermediate_puzzle.state.grid})
+                break
+
+        # Output path and grid.
+        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+
+            for pair in final_path[::-1]:
+                for move, grid in pair.items():
+                    f.write("{} {}\n".format(move, collapse_list(grid)))
+            f.close()
+
+        return final_path
+
+    # Hit max depth and didn't reach solution.
+    elif max_d == 0:
+        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+            f.write("no solution")
+            f.close()
+        return "1"
+
+    # Continue recursive calls of dfs limited depth.
+    else:
+        # Get all child states and run dls on them.
+        child_states = current_puzzle.generate_states()
+        hit_max_depth = False
+
+        # Launch recursive calls of dls on children nodes.
+        for child_node in child_states:
+
+            # Print node that is being visited at the moment (write if file doesnt exist, append if it does.)
+            fname = f"out/{puzzle_number}_dfs_search.txt"
+            with open(fname, "a+") as f:
+                f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(child_node.state.grid)))
+                f.close()
+
+            # Decrement max_d on each recursive call.
+            result = recursive_dls(n, max_d - 1, max_l, child_node, puzzle_number)
             
-            # Put leftmost_puzzle from open to closed
-            closed_l.append(open_l.pop(0))
-        
-    return 1
+            # Check if we have hit no sol (failure) or max depth with no sol (cutoff)
+            if max_depth_hit(result):
+                hit_max_depth = True
+            else:
+                return result 
+            
+        # Check if hit max or failed search
+        if hit_max_depth:
+            return "1"
+        else:
+            return []
 
-if __name__ == "__main__":
-    for args in parse(testfile):
-        dfs(*args)
+def max_depth_hit(result):
+    """
+    Check if search ended because hit max.
+    """
+    return (len(result) == 1) and (result[0] == "1")
+
+
+if __name__ == '__main__':
+    
+    # Run search and output to text files.
+    for puzzle_version, case_args in enumerate(parse(testfile)):
+        
+        # Write initial setup to search file.
+        initial_node = Node("0", Board(case_args[3]))
+        fname = f"out/{puzzle_version}_dfs_search.txt"
+        with open(fname, "a+") as f:
+            f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(initial_node.state.grid)))
+            f.close()
+        
+        # Run dfs
+        recursive_dls(*case_args[:3], initial_node, puzzle_version)
