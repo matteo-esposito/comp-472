@@ -143,4 +143,3 @@ if __name__ == '__main__':
 
         # Write out "no solution" in the case where we return a failed search.
         write_no_solution(res, version)
-        print("ok")
