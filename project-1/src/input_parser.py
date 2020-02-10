@@ -1,6 +1,19 @@
 # Let test file be importable
 testfile = "test-cases-and-solutions/test.txt"
 
+def collapse_list(nl):
+    """
+    Converts nested list to a string with no delimiter.
+
+    Args:
+        nl (nested list)
+    """
+    outstring = ""
+    for i in range(len(nl)):
+        for j in range(len(nl[i])):
+            outstring += str(nl[i][j])
+    return outstring
+
 def parse(filepath):
     """
     Function to parse a .txt file with the following format:
@@ -11,12 +24,12 @@ def parse(filepath):
         filepath {String} -- filepath to input .txt file
 
     Returns:
-        Nested list -- nested list where each inner list is composed of the 4 inputs 
+        Nested list -- nested list where each inner list is composed of the 4 inputs
                        (3 integers and one grid (in nested list form))
 
         [
-        3, 7, 100, [[1, 1, 1], 
-                    [0, 0, 1], 
+        3, 7, 100, [[1, 1, 1],
+                    [0, 0, 1],
                     [0, 1, 1]]
         ]
 
@@ -28,7 +41,7 @@ def parse(filepath):
 
             Note: When using DFS, you can ignore maxl and when using BFS or A⋆ , you can ignore max_d."
     """
-    
+
     # Open and read file
     with open(filepath) as f:
         lines = [line.rstrip().split(" ") for line in f]
@@ -39,17 +52,20 @@ def parse(filepath):
         # Initialize list and grid string
         inner_list = []
         grid = l[3]
-        
+
         # Append first 3 entries
         for entry in l[:3]:
             inner_list.append(int(entry))
-        
+
         # Deal with 4th entry (turn into int grid row and append to inner_list)
         grid_size = inner_list[0]
         string_grid = [list(grid[i:i + grid_size]) for i in range(0, len(l[3]), grid_size)] # Split string into rows
         fourth_element = [list(map(int, row)) for row in string_grid] # Convert entries to int
         inner_list.append(fourth_element)
-        
+
         nested_outlist.append(inner_list)
 
-    return nested_outlist
+    try:
+        return nested_outlist
+    except IndexError:
+        return None
