@@ -1,8 +1,9 @@
 from board import Board
+import math
 
 
 class Node:
-    def __init__(self, move, state, parent=None, g):
+    def __init__(self, move, state, g, parent=None):
         """
         Node class to be used for grid space searching.
 
@@ -52,5 +53,5 @@ class Node:
         return children
 
     def calculate_h(self):
-        list_grid = [e for row in self.state for e in row]
+        list_grid = [e for row in self.state.grid for e in row]
         return math.ceil(sum(list_grid) / 5)
