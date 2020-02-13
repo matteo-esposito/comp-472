@@ -1,7 +1,8 @@
 from board import Board
 
+
 class Node:
-    def __init__(self, move, state, parent=None):
+    def __init__(self, move, state, parent=None, g):
         """
         Node class to be used for grid space searching.
 
@@ -13,6 +14,9 @@ class Node:
         self.move = move
         self.parent = parent
         self.state = state
+        self.g = g
+        self.h = self.calculate_h()
+        self.f = self.g + self.h
 
     def __eq__(self, other):
         return self.state.grid == other.state.grid
@@ -32,17 +36,21 @@ class Node:
     def generate_states(self):
         children = []
         n = len(self)
-        alpha = list(map(chr, range(ord('A'), ord('Z')+1))) # alphabet
+        alpha = list(map(chr, range(ord('A'), ord('Z') + 1)))  # alphabet
 
         # Generate children
         for y in alpha[:n]:
-            for x in range(1,27)[:n]:
+            for x in range(1, 27)[:n]:
 
                 # Make move, create child Node (includes move and board) and append this new node to parent.
                 move = y + str(x)
                 new_state = self.state.touch(move)
-                child = Node(move = move, state = Board(new_state), parent = self)
+                child = Node(move=move, state=Board(new_state), parent=self, g=self.g + 1)
 
                 children.append(child)
 
         return children
+
+    def calculate_h(self):
+        list_grid = [e for row in self.state for e in row]
+        return math.ceil(sum(list_grid) / 5)

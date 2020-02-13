@@ -1,4 +1,6 @@
 import copy
+import math
+
 
 class Board:
 
@@ -19,7 +21,7 @@ class Board:
             try:
                 if x < 0 or y < 0 or x >= n or y >= n:
                     raise IndexError
-                temp_grid[y][x] ^= 1 # Flip from black to white or vice versa.
+                temp_grid[y][x] ^= 1  # Flip from black to white or vice versa.
             except IndexError:
                 continue
 
