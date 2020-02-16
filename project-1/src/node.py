@@ -53,5 +53,6 @@ class Node:
         return children
 
     def calculate_h(self):
+        # Heuristic function, tests number of moves necessary assuming every move flips 5 arbitrary squares
         list_grid = [e for row in self.state.grid for e in row]
         return math.ceil(sum(list_grid) / 5)

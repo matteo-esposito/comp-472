@@ -6,37 +6,41 @@ from board import Board
 from input_parser import parse, testfile, collapse_list
 from node import Node
 
+# Keeps track of the number of nodes visited
+class Counter:
+    def __init__(self):
+        self.count = 0
 
-def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number):
+
+def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, counter):
+
+    counter.count += 1
 
     write_visit(file, current_puzzle)
 
+    # Test goal
     if current_puzzle.state.goal_test():
         return '2', current_puzzle
 
-    elif max_l == 1:
+    # Max number of nodes visited
+    elif counter.count == max_l:
         return '1', current_puzzle
 
     else:
-        successors = []
-        child_states = current_puzzle.generate_states()
-        for child in child_states:
-            child.f = max(child.f, current_puzzle.f)
-            successors.append(child)
-
+        successors = [child for child in current_puzzle.generate_states()]
         while True:
             best = find_best(successors, sort_nodes, 0)
-            if best.f > f_limit:
+            if best.f > f_limit:  # Failure, backtrack back to f_limit
                 return '0', best
             alternative = find_best(successors, sort_nodes, 1)
-            result, best_recursive_node = recursive_a_star(n, max_d, max_l - 1, best, min(f_limit, alternative.f), file, puzzle_number)
+            result, best_recursive_node = recursive_a_star(n, max_d, max_l, best, min(f_limit, alternative.f), file, puzzle_number, counter)  # Search best
             best.f = best_recursive_node.f
-            if result != '0':
+            if result != '0':  # Check if result was not a backtrack
                 return result, best_recursive_node
 
 
 def sort_nodes(node):
-    val = str(node.f)  # Start with f value (first sort)
+    val = str(node.f)  # Start with f-value (first sort)
     val += collapse_list(node.state.grid)  # Append string representation of grid (second sort in case of ties)
     return int(val)
 
@@ -71,12 +75,14 @@ if __name__ == '__main__':
 
     for version, case_args in enumerate(parse(testfile)):
 
+        counter = Counter()
+
         with open(f'out_a_star/{version}_a_star_search.txt', 'w+') as search_file:
 
             initial_node = Node('0', Board(case_args[3]), 0)
 
             s = time.time()
-            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version)
+            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, counter)
             print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
             search_file.close()
 
@@ -84,5 +90,5 @@ if __name__ == '__main__':
             if result == '2':
                 write_solution(solution_file, final_node)
             else:
-                solutions_file.write('no solution')
+                solution_file.write('no solution')
             solution_file.close()
