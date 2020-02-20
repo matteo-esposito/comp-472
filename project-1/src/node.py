@@ -3,7 +3,7 @@ import math
 
 
 class Node:
-    def __init__(self, move, state, g=None, parent=None):
+    def __init__(self, move, state, g=0, parent=None):
         """
         Node class to be used for grid space searching.
 
@@ -34,7 +34,7 @@ class Node:
     def get_parent(self):
         return self.parent
 
-    def generate_states(self):
+    def generate_states(self, use_g=True):
         children = []
         n = len(self)
         alpha = list(map(chr, range(ord('A'), ord('Z') + 1)))  # alphabet
@@ -46,7 +46,10 @@ class Node:
                 # Make move, create child Node (includes move and board) and append this new node to parent.
                 move = y + str(x)
                 new_state = self.state.touch(move)
-                child = Node(move=move, state=Board(new_state), parent=self, g=self.g + 1)
+                if use_g:
+                    child = Node(move=move, state=Board(new_state), parent=self, g=self.g + 1)
+                else:
+                    child = Node(move=move, state=Board(new_state), parent=self)
 
                 children.append(child)
 
