@@ -3,7 +3,7 @@ import math
 
 
 class Node:
-    def __init__(self, move, state, g, parent=None):
+    def __init__(self, move, state, g=None, parent=None):
         """
         Node class to be used for grid space searching.
 
