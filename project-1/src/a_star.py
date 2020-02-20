@@ -7,14 +7,14 @@ from input_parser import parse, testfile, collapse_list
 from node import Node
 
 # Keeps track of the number of nodes visited
-class Counter:
-    def __init__(self):
-        self.count = 0
+# class Counter:
+#     def __init__(self):
+#         self.count = 0
 
 
-def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, counter):
+def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, path_length):
 
-    counter.count += 1
+    path_length += 1
 
     write_visit(file, current_puzzle)
 
@@ -23,7 +23,7 @@ def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_numb
         return '2', current_puzzle
 
     # Max number of nodes visited
-    elif counter.count == max_l:
+    elif path_length == max_l:
         return '1', current_puzzle
 
     else:
@@ -33,7 +33,7 @@ def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_numb
             if best.f > f_limit:  # Failure, backtrack back to f_limit
                 return '0', best
             alternative = find_best(successors, sort_nodes, 1)
-            result, best_recursive_node = recursive_a_star(n, max_d, max_l, best, min(f_limit, alternative.f), file, puzzle_number, counter)  # Search best
+            result, best_recursive_node = recursive_a_star(n, max_d, max_l, best, min(f_limit, alternative.f), file, puzzle_number, path_length + 1)  # Search best
             best.f = best_recursive_node.f
             if result != '0':  # Check if result was not a backtrack
                 return result, best_recursive_node
@@ -75,14 +75,15 @@ if __name__ == '__main__':
 
     for version, case_args in enumerate(parse(testfile)):
 
-        counter = Counter()
+        # counter = Counter()
+        path_length = 0
 
         with open(f'out_a_star/{version}_a_star_search.txt', 'w+') as search_file:
 
             initial_node = Node('0', Board(case_args[3]), 0)
 
             s = time.time()
-            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, counter)
+            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, path_length)
             print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
             search_file.close()
 
