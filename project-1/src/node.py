@@ -16,7 +16,7 @@ class Node:
         self.parent = parent
         self.state = state
         self.g = g
-        self.h = self.calculate_h2()
+        self.h = self.calculate_h1()
         self.f = self.g + self.h
 
     def __eq__(self, other):
@@ -55,7 +55,7 @@ class Node:
 
         return children
 
-    def calculate_h(self):
+    def calculate_h1(self):
         # Heuristic function, tests number of moves necessary assuming every move flips 5 arbitrary squares
         list_grid = [e for row in self.state.grid for e in row]
         return math.ceil(sum(list_grid) / 5)

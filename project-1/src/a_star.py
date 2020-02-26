@@ -68,7 +68,7 @@ def write_visit(f, node):
 
 
 if __name__ == '__main__':
-    desired_folder_path = os.path.join(os.getcwd(), "out_a_star/")
+    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h1/")
     if os.path.isdir(desired_folder_path):
         shutil.rmtree(desired_folder_path, ignore_errors=True)
     os.mkdir(desired_folder_path)
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         # counter = Counter()
         path_length = 0
 
-        with open(f'out_a_star/{version}_a_star_search.txt', 'w+') as search_file:
+        with open(os.path.join(desired_folder_path, f'{version}_a_star_search.txt'), 'w+') as search_file:
 
             initial_node = Node('0', Board(case_args[3]), 0)
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
             print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
             search_file.close()
 
-        with open(f'out_a_star/{version}_a_star_solution.txt', 'w+') as solution_file:
+        with open(os.path.join(desired_folder_path, f'{version}_a_star_solution.txt'), 'w+') as solution_file:
             if result == '2':
                 write_solution(solution_file, final_node)
             else:
