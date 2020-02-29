@@ -39,6 +39,41 @@ def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_numb
                 return result, best_recursive_node
 
 
+def iterative_a_star(n, max_d, max_l, current_puzzle, file, puzzle_number):
+
+    successors = [child for child in current_puzzle.generate_states()]
+
+    priority_queue = find_sorted_list(successors, sort_nodes)
+
+    closed_list = []
+
+    path_length = 1
+
+    write_visit(file, current_puzzle)
+
+    while path_length < max_l:
+        best = priority_queue.pop(0)
+        closed_list.append(best)
+
+        write_visit(file, best)
+
+        # Testing Goal
+        if best.state.goal_test():
+            return '2', best
+
+        # Adding Unvisited children nodes to Priority Queue
+        for child in best.generate_states():
+            if child not in closed_list:
+                priority_queue.append(child)
+
+        # Resorting Priority Queue
+        priority_queue = find_sorted_list(priority_queue, sort_nodes)
+
+        path_length += 1
+
+    return '1', best
+
+
 def sort_nodes(node):
     val = str(node.f)  # Start with f-value (first sort)
     val += collapse_list(node.state.grid)  # Append string representation of grid (second sort in case of ties)
@@ -47,6 +82,10 @@ def sort_nodes(node):
 
 def find_best(nodes, key, i):
     return sorted(nodes, key=key)[i]
+
+
+def find_sorted_list(nodes, key):
+    return sorted(nodes, key=key)
 
 
 def write_solution(f, final_node):
@@ -68,7 +107,7 @@ def write_visit(f, node):
 
 
 if __name__ == '__main__':
-    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h1/")
+    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h2_iterative/")
     if os.path.isdir(desired_folder_path):
         shutil.rmtree(desired_folder_path, ignore_errors=True)
     os.mkdir(desired_folder_path)
@@ -83,7 +122,8 @@ if __name__ == '__main__':
             initial_node = Node('0', Board(case_args[3]), 0)
 
             s = time.time()
-            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, path_length)
+            # result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, path_length)
+            result, final_node = iterative_a_star(*case_args[:3], initial_node, search_file, version)
             print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
             search_file.close()
 
