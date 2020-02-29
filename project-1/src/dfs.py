@@ -6,10 +6,9 @@ from board import Board
 from input_parser import parse, testfile, collapse_list
 from node import Node
 
-
 def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
     """Recursive implementation of depth limited search.
-    
+
     Arguments:
         n {int} -- size of grid (i.e. 2x2 = 2, 3x3 = 3)
         max_d {int} -- max depth
@@ -73,7 +72,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
             else:
                 return result
 
-                # Check if hit max or failed search for each child in the generated child states.
+        # Check if hit max or failed search for each child in the generated child states.
         if hit_max_depth:
             return "1"  # Backtrack
         else:
@@ -82,10 +81,10 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
 
 def max_depth_hit(result):
     """Check if the search yielded no solution due to having hit the max depth.
-    
+
     Arguments:
         result {str, list} -- Result of search.
-    
+
     Returns:
         bool -- Has max depth been hit.
     """
@@ -94,7 +93,7 @@ def max_depth_hit(result):
 
 def write_starting_state(start_node, puzzle_version):
     """Write out starting state in search text file.
-    
+
     Arguments:
         start_node {Node} -- start node of the problem.
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
@@ -108,7 +107,7 @@ def write_starting_state(start_node, puzzle_version):
 
 def write_no_solution(result, puzzle_version):
     """Write to solution file "no solution" in the case that dfs never yields a solution.
-    
+
     Arguments:
         result {dict or str} -- If result == "1", we know we didn't reach a solution and this method will run.
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
