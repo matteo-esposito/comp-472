@@ -36,7 +36,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
                 break
 
         # Output path and grid.
-        with open(f"out/{puzzle_number}_dfs_solution.txt", 'w') as f:
+        with open(f"out_dfs/{puzzle_number}_dfs_solution.txt", 'w') as f:
 
             for pair in final_path[::-1]:
                 for move, grid in pair.items():
@@ -59,7 +59,7 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
         for child_node in child_states:
 
             # Print node that is being visited at the moment (write if file doesnt exist, append if it does.)
-            fname = f"out/{puzzle_number}_dfs_search.txt"
+            fname = f"out_dfs/{puzzle_number}_dfs_search.txt"
             with open(fname, "a+") as f:
                 f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(child_node.state.grid)))
                 f.close()
@@ -99,7 +99,7 @@ def write_starting_state(start_node, puzzle_version):
         start_node {Node} -- start node of the problem.
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
     """
-    fname = f"out/{puzzle_version}_dfs_search.txt"
+    fname = f"out_dfs/{puzzle_version}_dfs_search.txt"
     with open(fname, "w+") as f:
         f.write("{} {} {} {}\n".format("0", "0", "0", collapse_list(start_node.state.grid)))
         f.close()
@@ -114,7 +114,7 @@ def write_no_solution(result, puzzle_version):
         puzzle_version {int} -- iterator for filenaming (same as the one used for the search).
     """
     if result == "1":
-        with open(f"out/{puzzle_version}_dfs_solution.txt", 'w+') as f:
+        with open(f"out_dfs/{puzzle_version}_dfs_solution.txt", 'w+') as f:
             f.write("no solution")
             f.close()
     return
@@ -123,7 +123,7 @@ def write_no_solution(result, puzzle_version):
 if __name__ == '__main__':
 
     # If folder exists, delete it and create a new version (clear old output)
-    desired_folder_path = os.path.join(os.getcwd(), "out/")
+    desired_folder_path = os.path.join(os.getcwd(), "out_dfs/")
     if os.path.isdir(desired_folder_path):
         shutil.rmtree(desired_folder_path, ignore_errors=True)
     os.mkdir(desired_folder_path)

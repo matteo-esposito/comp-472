@@ -9,8 +9,11 @@ class Node:
 
         Attributes:
             state (Board) - has attribute grid (actual nested list of 1, 0.)
-            parent (Node)
-            action (str)
+            parent (Node) - parent node
+            action (str) - string move (e.g. 'A1' to 'C3' in the case of a 3x3 puzzle)
+            g (int) - cost function value
+            h (int) - heuristic function value
+            f (int) - evaluation function value
         """
         self.move = move
         self.parent = parent
