@@ -6,10 +6,10 @@ from board import Board
 from input_parser import parse, testfile, collapse_list
 from node import Node
 
-# Keeps track of the number of nodes visited
-# class Counter:
-#     def __init__(self):
-#         self.count = 0
+
+class Counter:  # Keeps track of the number of nodes visited
+    def __init__(self):
+        self.count = 0
 
 
 def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, path_length):
@@ -53,6 +53,9 @@ def iterative_a_star(n, max_d, max_l, current_puzzle, file, puzzle_number):
 
     while path_length < max_l:
         best = priority_queue.pop(0)
+        while best in closed_list:
+            best = priority_queue.pop(0)
+
         closed_list.append(best)
 
         write_visit(file, best)
@@ -107,14 +110,14 @@ def write_visit(f, node):
 
 
 if __name__ == '__main__':
-    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h2_iterative/")
+    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h1_iterative/")
     if os.path.isdir(desired_folder_path):
         shutil.rmtree(desired_folder_path, ignore_errors=True)
     os.mkdir(desired_folder_path)
 
     for version, case_args in enumerate(parse(testfile)):
 
-        # counter = Counter()
+        counter = Counter()
         path_length = 0
 
         with open(os.path.join(desired_folder_path, f'{version}_a_star_search.txt'), 'w+') as search_file:

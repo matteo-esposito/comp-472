@@ -1,5 +1,5 @@
 # Let test file be importable
-testfile = "test-cases-and-solutions/test.txt"
+testfile = "test-cases-and-solutions/test_report.txt"
 
 def collapse_list(nl):
     """
