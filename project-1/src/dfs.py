@@ -74,9 +74,9 @@ def recursive_dls(n, max_d, max_l, current_puzzle, puzzle_number):
 
         # Check if hit max or failed search for each child in the generated child states.
         if hit_max_depth:
-            return "1"  # Backtrack
+            return "1" 
         else:
-            return []  # Continue
+            return []
 
 
 def max_depth_hit(result):

@@ -1,26 +1,49 @@
 https://github.com/matteo-esposito/comp-472
-# COMP 472 | Artificial Intelligence, Winter 2020
 
-## Project 1: Indonesian Dot Puzzle
+# COMP472 - Project 1
 
-### Deliverable 1 (Feb 9)
+## Usage (General)
 
-#### Usage (DFS)
-1. Clone this repository and enter the `/src` directory.
+First, clone the repo and cd into the src folder.
 
 ```bash
 git clone https://github.com/matteo-esposito/comp-472.git
 cd comp-472/project-1/src/
 ```
 
-2. Run `dfs.py`
+## Usage (Algorithms)
 
-```python
+**Note:** If you want to provide your own test cases, modify the .txt file at the filepath in the `testfile` variable of `input_parser.py`.
+
+### 1. DFS
+
+```bash
 python dfs.py
 ```
 
-The expected console output should look like:
+### 2. A*
 
-![](project-1/src/assets/dfs.png)
+To choose a heuristic, simply modify line 19 of the `node.py` file: 
 
-3. Validate output in `/out` directory.
+```python
+self.h = self.calculate_h1() or self.h = self.calculate_h2()
+```
+
+then,
+
+```bash
+python a_star.py
+```
+
+### 3. BFS
+
+The run procedure is the same as A* but set;
+
+```python
+use_g = False
+```
+on line 40 for node class to indicate that no g(n) function is used. Then,
+
+```bash
+python bfs.py
+```
