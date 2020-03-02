@@ -59,9 +59,6 @@ def iterative_bfs(n, max_d, max_l, current_puzzle, file, puzzle_number, path_len
     return '1', best
 
 
-
-
-
 def sort_nodes(node):
     val = str(node.f)  # Start with f-value (first sort)
     val += collapse_list(node.state.grid)  # Append string representation of grid (second sort in case of ties)
