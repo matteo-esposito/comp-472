@@ -7,6 +7,9 @@ class Board:
     def __init__(self, grid):
         self.grid = grid
 
+    def __eq__(self, other):
+        return self.grid == other.grid
+
     def touch(self, move):
         # move must be in the form A1,...,D4,etc
         y_coord = ord(move[0]) - 65

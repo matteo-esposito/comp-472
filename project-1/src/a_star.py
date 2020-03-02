@@ -6,15 +6,15 @@ from board import Board
 from input_parser import parse, testfile, collapse_list
 from node import Node
 
-# Keeps track of the number of nodes visited
-class Counter:
+
+class Counter:  # Keeps track of the number of nodes visited
     def __init__(self):
         self.count = 0
 
 
-def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, counter):
+def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_number, path_length):
 
-    counter.count += 1
+    path_length += 1
 
     write_visit(file, current_puzzle)
 
@@ -23,7 +23,7 @@ def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_numb
         return '2', current_puzzle
 
     # Max number of nodes visited
-    elif counter.count == max_l:
+    elif path_length == max_l:
         return '1', current_puzzle
 
     else:
@@ -33,10 +33,48 @@ def recursive_a_star(n, max_d, max_l, current_puzzle, f_limit, file, puzzle_numb
             if best.f > f_limit:  # Failure, backtrack back to f_limit
                 return '0', best
             alternative = find_best(successors, sort_nodes, 1)
-            result, best_recursive_node = recursive_a_star(n, max_d, max_l, best, min(f_limit, alternative.f), file, puzzle_number, counter)  # Search best
+            result, best_recursive_node = recursive_a_star(n, max_d, max_l, best, min(f_limit, alternative.f), file, puzzle_number, path_length + 1)  # Search best
             best.f = best_recursive_node.f
             if result != '0':  # Check if result was not a backtrack
                 return result, best_recursive_node
+
+
+def iterative_a_star(n, max_d, max_l, current_puzzle, file, puzzle_number):
+
+    successors = [child for child in current_puzzle.generate_states()]
+
+    priority_queue = find_sorted_list(successors, sort_nodes)
+
+    closed_list = []
+
+    path_length = 1
+
+    write_visit(file, current_puzzle)
+
+    while path_length < max_l:
+        best = priority_queue.pop(0)
+        while best in closed_list:
+            best = priority_queue.pop(0)
+
+        closed_list.append(best)
+
+        write_visit(file, best)
+
+        # Testing Goal
+        if best.state.goal_test():
+            return '2', best
+
+        # Adding Unvisited children nodes to Priority Queue
+        for child in best.generate_states():
+            if child not in closed_list:
+                priority_queue.append(child)
+
+        # Resorting Priority Queue
+        priority_queue = find_sorted_list(priority_queue, sort_nodes)
+
+        path_length += 1
+
+    return '1', best
 
 
 def sort_nodes(node):
@@ -47,6 +85,10 @@ def sort_nodes(node):
 
 def find_best(nodes, key, i):
     return sorted(nodes, key=key)[i]
+
+
+def find_sorted_list(nodes, key):
+    return sorted(nodes, key=key)
 
 
 def write_solution(f, final_node):
@@ -68,7 +110,7 @@ def write_visit(f, node):
 
 
 if __name__ == '__main__':
-    desired_folder_path = os.path.join(os.getcwd(), "out_a_star/")
+    desired_folder_path = os.path.join(os.getcwd(), "out_a_star_h1_iterative/")
     if os.path.isdir(desired_folder_path):
         shutil.rmtree(desired_folder_path, ignore_errors=True)
     os.mkdir(desired_folder_path)
@@ -76,17 +118,19 @@ if __name__ == '__main__':
     for version, case_args in enumerate(parse(testfile)):
 
         counter = Counter()
+        path_length = 0
 
-        with open(f'out_a_star/{version}_a_star_search.txt', 'w+') as search_file:
+        with open(os.path.join(desired_folder_path, f'{version}_a_star_search.txt'), 'w+') as search_file:
 
             initial_node = Node('0', Board(case_args[3]), 0)
 
             s = time.time()
-            result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, counter)
+            # result, final_node = recursive_a_star(*case_args[:3], initial_node, 100000000, search_file, version, path_length)
+            result, final_node = iterative_a_star(*case_args[:3], initial_node, search_file, version)
             print(f"Time elapsed for puzzle {version} with size = {case_args[0]} and max_d = {case_args[1]}: {str(round(time.time() - s, 4))}s.")
             search_file.close()
 
-        with open(f'out_a_star/{version}_a_star_solution.txt', 'w+') as solution_file:
+        with open(os.path.join(desired_folder_path, f'{version}_a_star_solution.txt'), 'w+') as solution_file:
             if result == '2':
                 write_solution(solution_file, final_node)
             else:
