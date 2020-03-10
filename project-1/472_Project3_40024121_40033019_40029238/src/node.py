@@ -19,7 +19,7 @@ class Node:
         self.parent = parent
         self.state = state
         self.g = g
-        self.h = self.calculate_h2()
+        self.h = self.calculate_h1()
         self.f = self.g + self.h
 
     def __eq__(self, other):
