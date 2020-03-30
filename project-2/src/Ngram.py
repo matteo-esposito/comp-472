@@ -1,5 +1,5 @@
 class Ngram():
-    """Class used for bigram model.
+    """Class used for representing ngrams.
     """
 
     def __init__(self, language, count_table, probs_table, language_prob=0):
