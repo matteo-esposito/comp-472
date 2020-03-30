@@ -10,18 +10,25 @@ import string
 class NBClassifier():
     """Class used for Naive Bayes Classifier.
     """
-    global V
+
+    # TODO: Add isalpha() dictionary.
     global vocab
-
-    # TODO: Improve setup - Choices of vocabularies to be used in the model calls.
-
     vocab = {
         0: list(string.ascii_lowercase),
         1: list(string.ascii_lowercase) + list(string.ascii_uppercase),
-        2: []  # TODO: Add isalpha() dictionary.
+        2: []
     }
 
     def __init__(self, V, n, delta, train_file, test_file):
+        """Parametrized constructor for Naive Bayes Classifier.
+        
+        Arguments:
+            V {int} -- Vocabulary choice (1=[a,z], 2=[a-zA-Z], 3=isalpha())
+            n {int} -- ngram selection (1=uni, 2=bi, 3=tri)
+            delta {int} -- smoothing factor
+            train_file {string} -- path to train file
+            test_file {string} -- path to test file
+        """
         self.V = V
         self.n = n
         self.delta = delta
@@ -29,15 +36,42 @@ class NBClassifier():
         self.test_file = test_file
 
     def import_data(self):
+        """Read-in train and test files.
+        
+        Returns:
+            dataframe, dataframe -- train and test files.
+        """
         train = pd.read_csv(self.train_file, sep='\t', names=["id", "user", "lang", "tweet"])
         test = pd.read_csv(self.test_file, sep='\t', names=["id", "user", "lang", "tweet"])
         return train, test
 
-    # TODO: Add functionality for unigrams and trigrams
+    # TODO: Add functionality for trigrams
     def init_ngrams(self):
         """Initialize NGram objects
         """
-        if self.n == 2:
+        # Unigram case
+        if self.n == 1:
+            eu_unigram = Ngram(language="eu",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            ca_unigram = Ngram(language="ca",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            gl_unigram = Ngram(language="gl",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            es_unigram = Ngram(language="es",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            en_unigram = Ngram(language="en",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            pt_unigram = Ngram(language="pt",
+                              count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]),
+                              probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=["count"]))
+            return eu_unigram, ca_unigram, gl_unigram, es_unigram, en_unigram, pt_unigram
+        # Bigram case
+        elif self.n == 2:
             eu_bigram = Ngram(language="eu",
                               count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=vocab[self.V]),
                               probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=vocab[self.V]))
@@ -56,7 +90,12 @@ class NBClassifier():
             pt_bigram = Ngram(language="pt",
                               count_table=pd.DataFrame(data=0, index=vocab[self.V], columns=vocab[self.V]),
                               probs_table=pd.DataFrame(data=0, index=vocab[self.V], columns=vocab[self.V]))
-        return eu_bigram, ca_bigram, gl_bigram, es_bigram, en_bigram, pt_bigram
+            return eu_bigram, ca_bigram, gl_bigram, es_bigram, en_bigram, pt_bigram
+        # Trigram case
+        elif self.n == 3:
+            pass
+        else:
+            pass
 
     def train(self, train_df, selector):
         """Train the Naive Bayes Classifier. Modify all gram objects inplace.
@@ -74,17 +113,26 @@ class NBClassifier():
             # Modify entries in table selected above.
             for t in train_df[train_df['lang'] == language]['tweet']:
                 char_tweet = utils.to_char_list(t, vocab[self.V])
-                for i in range(len(char_tweet) - 1):
-                    c1 = char_tweet[i]
-                    c2 = char_tweet[i + 1]
-                    if c1 in table.columns and c2 in table.columns:
-                        table.at[c1, c2] += 1
+                
+                if self.n == 1:
+                    for i in range(len(char_tweet)):
+                        c1 = char_tweet[i]
+                        if c1 in table.index:
+                            table.at[c1, 'count'] += 1
+                elif self.n == 2:
+                    for i in range(len(char_tweet) - 1):
+                        c1 = char_tweet[i]
+                        c2 = char_tweet[i + 1]
+                        if c1 in table.columns and c2 in table.columns:
+                            table.at[c1, c2] += 1
+                elif self.n == 3:
+                    pass
 
         ### Add smoothing, generate probability table and get language probabilities.
-        for l, bigram in selector.items():
-            bigram.count_table += 0.5
-            bigram.probs_table = bigram.count_table.div(bigram.count_table.sum(axis=1), axis=0)
-            bigram.language_prob = train_df[train_df['lang'] == l].shape[0] / train_df.shape[0]
+        for l, ngram in selector.items():
+            ngram.count_table += self.delta
+            ngram.probs_table = ngram.count_table.div(ngram.count_table.sum(axis=1), axis=0)
+            ngram.language_prob = train_df[train_df['lang'] == l].shape[0] / train_df.shape[0]
 
         return
 
@@ -108,11 +156,21 @@ class NBClassifier():
             for language in set(test_df['lang']):
                 p = math.log10(selector[language].language_prob)
                 table = selector[language].probs_table
-                for i in range(len(test_tweet) - 1):
-                    c1 = test_tweet[i]
-                    c2 = test_tweet[i + 1]
-                    if c1 in table.columns and c2 in table.columns:
-                        p += math.log10(table.at[c1, c2])
+
+                if self.n == 1:
+                    for i in range(len(test_tweet)):
+                        c1 = test_tweet[i]
+                        if c1 in table.index:
+                            p += math.log10(table.at[c1, 'count'])
+                elif self.n == 2:
+                    for i in range(len(test_tweet) - 1):
+                        c1 = test_tweet[i]
+                        c2 = test_tweet[i + 1]
+                        if c1 in table.columns and c2 in table.columns:
+                            p += math.log10(table.at[c1, c2])
+                elif self.n == 3:
+                    pass
+
                 lang_probs[language] = p
 
             # Populate prediction lists
