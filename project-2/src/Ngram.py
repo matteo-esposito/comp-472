@@ -1,5 +1,5 @@
-class Ngram():
-    """Class used for representing ngrams.
+class Ngram2():
+        """Class used for representing ngrams.
     """
 
     def __init__(self, language, count_table, probs_table, language_prob=0):
@@ -7,8 +7,8 @@ class Ngram():
         
         Arguments:
             language {string} -- Choice from ['eu', 'ca', 'gl', 'es', 'en', 'pt']
-            count_table {dataframe} -- dataframe to store all ngram counts.
-            probs_table {dataframe} -- dataframe to store all smoothed ngram probabilities.
+            count_table {list} -- list of dicts to store all ngram counts.
+            probs_table {list} -- list of dicts to store all smoothed ngram probabilities.
         
         Keyword Arguments:
             language_prob {int} -- Language probability (default: {0})
