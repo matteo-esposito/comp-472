@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def to_char_list(tweet, vocabulary):
     """Convert tweet string into a character list for all characters in string that are in the 
     vocabulary chosen (including spaces).
@@ -26,14 +27,15 @@ def output_trace_file(table, v, n, d):
         f.write(table.to_string(header=False, index=False))
         f.close()
 
+
 def output_eval_file(table, v, n, d, selector):
     """Write overall evaluation file.
-    
+
     Arguments:
         table {dataframe} -- test df with results of classification task.
     """
 
-    acc = round(table[table['result'] == 'correct'].shape[0]/table.shape[0], 3)
+    acc = round(table[table['result'] == 'correct'].shape[0] / table.shape[0], 3)
 
     precisions = {}
     recalls = {}
@@ -45,21 +47,21 @@ def output_eval_file(table, v, n, d, selector):
         fp = table[(table['lang'] != l) & (table['pred_lang'] == l)].shape[0]
         fn = table[(table['lang'] == l) & (table['pred_lang'] != l)].shape[0]
 
-        if (tp+fp) == 0 or (tp+fn) == 0:
+        if (tp + fp) == 0 or (tp + fn) == 0:
             precisions[l] = 0
             recalls[l] = 0
         else:
-            precisions[l] = tp/(tp+fp)
-            recalls[l] = tp/(tp+fn)
-        
+            precisions[l] = tp / (tp + fp)
+            recalls[l] = tp / (tp + fn)
+
         # TODO: fix this workaround for gl, since we have 1 datapoint and 0 true positives.
-        if precisions[l]+recalls[l] == 0:
+        if precisions[l] + recalls[l] == 0:
             f1s[l] = 0
         else:
-            f1s[l] = (2*precisions[l]*recalls[l])/(precisions[l]+recalls[l])
-        
-        wa_f1 += table[table['lang'] == l].shape[0]*f1s[l]
-        
+            f1s[l] = (2 * precisions[l] * recalls[l]) / (precisions[l] + recalls[l])
+
+        wa_f1 += table[table['lang'] == l].shape[0] * f1s[l]
+
     macro_f1 = np.average(list(f1s.values()))
     wa_f1 /= table.shape[0]
 
@@ -72,9 +74,9 @@ def output_eval_file(table, v, n, d, selector):
                 f.write(str(round(metric_list[l], 3)))
                 f.write("  ")
             f.write("\n")
-        
+
         f.write(str(round(macro_f1, 3)))
         f.write("  ")
         f.write(str(round(wa_f1, 3)))
-        
+
         f.close()

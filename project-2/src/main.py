@@ -1,5 +1,7 @@
 from NBClassifier import NBClassifier
-import utils, os, shutil
+import utils
+import os
+import shutil
 
 
 if __name__ == "__main__":
