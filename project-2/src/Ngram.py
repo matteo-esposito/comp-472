@@ -1,6 +1,6 @@
 class Ngram():
     """Class used for representing ngrams.
-    
+
     Attributes:
         count_table (TYPE): Description
         language (TYPE): Description
@@ -11,7 +11,7 @@ class Ngram():
 
     def __init__(self, language, count_table, probs_table, n, language_prob=0):
         """Parametrized constructor for Ngrams.
-        
+
         Arguments:
             language (TYPE): Description
             count_table (TYPE): Description
@@ -22,7 +22,7 @@ class Ngram():
             count_table {list} -- list of dicts to store all ngram counts.
             probs_table {list} -- list of dicts to store all smoothed ngram probabilities.
             n {int} -- dimension of n-gram (helps with updating the dictionaries)
-        
+
         Keyword Arguments:
             language_prob {int} -- Language probability (default: {0})
         """
@@ -34,7 +34,7 @@ class Ngram():
 
     def smoothe(self, delta):
         """Summary
-        
+
         Args:
             delta (TYPE): Description
         """
@@ -55,7 +55,7 @@ class Ngram():
     def update_probs(self):
         """Calculates probabilities from count_table
         """
-        
+
         if self.n == 1:
             tot = sum(self.count_table.values())
             for key1 in self.count_table.keys():
@@ -74,7 +74,7 @@ class Ngram():
 
     def update_language_prob(self, train_df):
         """Updates the language probability for this ngram
-        
+
         Args:
             train_df (dictionary): Training data
         """
