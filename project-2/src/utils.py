@@ -73,7 +73,7 @@ def output_eval_file(table, v, n, d, languages, out_path):
             precisions[l] = tp / (tp + fp)
             recalls[l] = tp / (tp + fn)
 
-        # TODO: fix this workaround for gl, since we have 1 datapoint and 0 true positives.
+        # Workaround for cases where there are 0 true positives and therefore 0 precision and recall and undefined f1.
         if precisions[l] + recalls[l] == 0:
             f1s[l] = 0
         else:

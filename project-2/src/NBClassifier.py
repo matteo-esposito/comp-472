@@ -14,7 +14,7 @@ class NBClassifier():
     vocabulary = {
         0: list(string.ascii_lowercase),
         1: list(string.ascii_lowercase) + list(string.ascii_uppercase),
-        2: []
+        2: []  # Will be populated by NBClassifier.__get_vocab_2()
     }
     VALID_N = {1, 2, 3}
     languages = ['eu', 'ca', 'gl', 'es', 'en', 'pt']
@@ -46,7 +46,7 @@ class NBClassifier():
         """Returns the list of all unique isalpha() characters from train file as vocab
 
         Returns:
-            TYPE: list
+            list: list of characters representing vocabulary 2 as per the assignment guidelines.
         """
         with open(self.train_file, 'r', encoding='utf-8') as f:
             unique_chars = set(f.read())
@@ -57,7 +57,7 @@ class NBClassifier():
         """Imports data from train file
 
         Returns:
-            TYPE: train,test
+            dataframe: train, test lists of dicts
         """
         train = []
         test = []
@@ -67,19 +67,24 @@ class NBClassifier():
                 row = line.split('\t')
                 if len(row) != 4:
                     break
-                train.append({'id': row[0], 'user': row[1], 'lang': row[2], 'tweet': row[3]})
+                train.append(
+                    {'id': row[0], 'user': row[1], 'lang': row[2], 'tweet': row[3]})
 
         with open(self.test_file, 'r', encoding='utf-8') as f:
             for line in f:
                 row = line.split('\t')
                 if len(row) != 4:
                     break
-                test.append({'id': row[0], 'user': row[1], 'lang': row[2], 'tweet': row[3]})
+                test.append({'id': row[0], 'user': row[1],
+                             'lang': row[2], 'tweet': row[3]})
 
         return train, test
 
     def init_ngrams(self):
         """Initialize NGram objects
+        
+        Returns:
+            dict: language and Ngram object key value pairs.
         """
         # Unigram case
         if self.n == 1:
@@ -121,7 +126,6 @@ class NBClassifier():
 
         Arguments:
             train_df {dataframe} -- Training set of tweets
-            selector {dict} -- Dictionary of languages and grams (used to facilitate loops).
         """
         # Populate count table
         for language in languages:
@@ -168,8 +172,7 @@ class NBClassifier():
         """Test the trained classifier on new data. (log base 10 used for scoring function). Then place predictions in the test dataframe for output.
 
         Arguments:
-            test_df {dictionary} -- Test tweets
-            selector {dict} -- Dictionary of languages and grams (used to facilitate loops).
+            test_df {dictionary} -- Test tweets with predictions and correct/incorrect markers.
         """
         # Generate probability for test set for all 6 languages
         test_langs = []
@@ -180,7 +183,8 @@ class NBClassifier():
             if self.V in [0, 1]:
                 test_tweet = utils.to_char_list(t['tweet'], self.vocab)
             else:
-                test_tweet = utils.to_char_list(t['tweet'], self.vocab, use_alpha=True)
+                test_tweet = utils.to_char_list(
+                    t['tweet'], self.vocab, use_alpha=True)
             lang_probs = {}
 
             # Get probs
