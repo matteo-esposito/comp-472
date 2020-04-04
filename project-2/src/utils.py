@@ -52,6 +52,7 @@ def output_eval_file(table, v, n, d, languages, out_path):
 
     for l in languages:
         count = 0
+        #true_positives, false_positives, false_negatives
         tp = 0
         fp = 0
         fn = 0
