@@ -5,7 +5,7 @@ import shutil
 
 if __name__ == '__main__':
     # Initialize classifier
-    nbc = NBClassifier(V=2, n=3, delta=0.5, train_file="input/training-tweets.txt",
+    nbc = NBClassifier(V=2, n=2, delta=0.3, train_file="input/training-tweets.txt",
                        test_file="input/test-tweets-given.txt")
 
     # Import, train, test.
