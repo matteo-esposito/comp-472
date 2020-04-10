@@ -189,7 +189,10 @@ class NBClassifier():
 
             # Get probs
             for language in languages:
-                p = math.log10(self.selector[language].language_prob)
+                if self.selector[language].language_prob != 0.0:
+                    p = math.log10(self.selector[language].language_prob)
+                else:
+                    break
                 table = self.selector[language].probs_table
 
                 if self.n == 1:
@@ -220,6 +223,7 @@ class NBClassifier():
                 lang_probs[language] = p
 
             # Add predictions
+            # print(lang_probs)
             t['pred_lang'] = max(lang_probs, key=lang_probs.get)
             t['pred_prob'] = '%.2E' % Decimal(max(lang_probs.values()))
             t['result'] = 'correct' if t['pred_lang'] == t['lang'] else 'wrong'
