@@ -52,6 +52,7 @@ def output_eval_file(table, v, n, d, languages, out_path):
 
     for l in languages:
         count = 0
+        #true_positives, false_positives, false_negatives
         tp = 0
         fp = 0
         fn = 0
@@ -73,7 +74,7 @@ def output_eval_file(table, v, n, d, languages, out_path):
             precisions[l] = tp / (tp + fp)
             recalls[l] = tp / (tp + fn)
 
-        # TODO: fix this workaround for gl, since we have 1 datapoint and 0 true positives.
+        # Workaround for cases where there are 0 true positives and therefore 0 precision and recall and undefined f1.
         if precisions[l] + recalls[l] == 0:
             f1s[l] = 0
         else:
