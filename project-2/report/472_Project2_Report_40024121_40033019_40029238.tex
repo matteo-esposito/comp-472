@@ -40,7 +40,7 @@ Kabir Soni\inst{3}}
 40029238 \email{matthew.jx.liu@gmail.com} \and
 40033019 \email{kabirsoni524@gmail.com}}
 
-\maketitle   
+\maketitle
 
 \section{Introduction \& Technical Details}
 
@@ -68,12 +68,12 @@ The file structure of our project is as follows:
 
 \subsection{Packages}
 
-We used a total of 7 packages in our project, 5 existing, along with our 2 internal packages (board and node). 
+We used a total of 7 packages in our project, 5 existing, along with our 2 internal packages (board and node).
 
 \begin{enumerate}
-    \item Existing 
+    \item Existing
     \begin{itemize}
-        \item \verb|shutil| and \verb|os|: Folder and file management in the creation and deletion of output folders for our search and solution files. 
+        \item \verb|shutil| and \verb|os|: Folder and file management in the creation and deletion of output folders for our search and solution files.
         \item \verb|math|: Calculating log base 10 probabilities as part of the score function of each tweet.
         \item \verb|copy|: Used to create deep copies in the initialization of ngrams in the NBClassifier class.
         \item \verb|decimal.Decimal|: Used to format the probability output for the trace file.
@@ -82,7 +82,7 @@ We used a total of 7 packages in our project, 5 existing, along with our 2 inter
     \item Internal
     \begin{itemize}
         \item \verb|NBClassifier|: Class that is used to represent the classifier, which takes a vocabulary selection, ngram size, delta/smoothing value and train/test file links.
-        \item \verb|Ngram|: Class used to represent the Ngram used in the NBClassifier class. 
+        \item \verb|Ngram|: Class used to represent the Ngram used in the NBClassifier class.
     \end{itemize}
 \end{enumerate}
 
@@ -153,7 +153,7 @@ We notice that there are no observation in the 'eu' class. Every classification 
 
 \section{Our Model (BYOM)}
 
-\textcolor{red}{Kabir}
+When choosing between different types of n-gram models, it is often context-based on the type of training set that we have. There are times when a unigram may be underfitting a dataset due to lack of variables, or that a trigram may overfit the dataset. We decided to create a language model that can incorporate all the n-gram sizes into one. First, we generate all the conditional probabilities for the unigram, bigram, and trigram tables. Then through linear interpolation techniques, we combine all the probabilities using arbitrary weights into one combined table to be used for the testing data. Two additional hyper-parameters have been added, $w_1$ and $w_2$. These parameters describe the weights assigned to the trigram and bigram respectively. Then $w_3$ is calculated from the difference, $w_3 = 1 - (w_1 + w_2).$
 
 \newpage
 \section{Result \& Experiment Analysis}
@@ -200,7 +200,7 @@ The second model had an accuracy of 0.848, a macro F1 of 0.622 and a weighted F1
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=12.5cm]{images/test_tweets_given_results_1_2_0.5.png}
+        \includegraphics[width=12.5cm]{images/test_tweets_given_results_1_2_0-5.png}
         \caption{Metrics on original test set, $V=1, n=2, \delta=0.5$}
         \label{fig:pre_demo_1_2_0.5}
     \end{center}
@@ -261,14 +261,12 @@ The confusion matrix shown in Table~\ref{tab:pre_demo_confusion_1_3_1} shows tha
 	\end{tabular}
 \end{table}
 
-
-
 \subsubsection{Model 4 ($V=2, n=2, \delta=0.3$): }
-The fourth and final model had an accuracy of 0.88, a macro F1 of 0.651 and a weighted F1 of 0.884 on the pre-demo test set. The per-class metrics are shown in Figure~\ref{fig:pre_demo_2_2_0.3}. \\
+The fourth model had an accuracy of 0.88, a macro F1 of 0.651 and a weighted F1 of 0.884 on the pre-demo test set. The per-class metrics are shown in Figure~\ref{fig:pre_demo_2_2_0.3}. \\
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=12.5cm]{images/test_tweets_given_results_2_2_0.3.png}
+        \includegraphics[width=12.5cm]{images/test_tweets_given_results_2_2_0-3.png}
         \caption{Metrics on original test set, $V=2, n=2, \delta=0.3$}
         \label{fig:pre_demo_2_2_0.3}
     \end{center}
@@ -294,6 +292,10 @@ Once again the global metrics have increased across the board, but only marginal
 
 We can probably assume that the increased vocabulary aided the model on a global level, while the use of bigrams may have hindered the classifier for the Catalan class. Overall, this final model performs the best when looking at the metrics.
 
+
+\subsubsection{Model 5 - BYOM ($V=1, \delta=0.5$): }
+The BYOM model had an accuracy of 0.893, a macro F1 of 0.682, and a weighted F1 of 0.891. The per-class metrics are shown in Figure~\ref{fig:pre_demo_BYOM}. \\
+
 \begin{figure}
     \begin{center}
         \includegraphics[width=12.5cm]{images/test_tweets_given_results_BYOM.png}
@@ -301,6 +303,24 @@ We can probably assume that the increased vocabulary aided the model on a global
         \label{fig:pre_demo_BYOM}
     \end{center}
 \end{figure}
+
+Here we can see that the global metrics have all marginally increased. With a very large training set, it makes sense to provide the largest weight to the trigram model, since it is more likely to have seen helpful trigrams. The per-class metrics also marginally increased over all languages  compared to the trigram model, as we gave the most weight to it. The Catalan class remains balanced with 51 true positives and fewer false positives.
+
+\begin{table}
+	\centering
+	\caption{Cross tabulation of predictions (BYOM), $V=1, n=2, \delta=0.5$}
+	\label{tab:pre_demo_confusion_BYOM}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+		& & \multicolumn{6}{c|}{Predicted} \\ \hline
+		& &  ca &   en &    es &   eu &  gl &    pt \\ \hline
+		\multirow{6}{*}{Actual} & ca   &  51 &    1 &    23 &    0 &   0 &     0 \\
+		& en   &   3 &  406 &   102 &    2 &   0 &     3 \\
+		& es   &  11 &   16 &  3914 &    7 &   0 &    25 \\
+		& eu   &   2 &    4 &   109 &  264 &   0 &     1 \\
+		& gl   &   0 &    0 &     1 &    0 &   0 &     0 \\
+		& pt   &  17 &    9 &   412 &    0 &   2 &  1615 \\ \hline
+	\end{tabular}
+\end{table}
 
 \newpage
 
@@ -341,7 +361,7 @@ The second model had an accuracy of 0.808, a macro F1 of 0.516 and a weighted F1
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=12.5cm]{images/test5_results_1_2_0.5.png}
+        \includegraphics[width=12.5cm]{images/test5_results_1_2_0-5.png}
         \caption{Metrics on demo test set, $V=1, n=2, \delta=0.5$}
         \label{fig:demo_1_2_0.5}
     \end{center}
@@ -401,13 +421,13 @@ The fourth model had an accuracy of 0.834, a macro F1 of 0.544 and a weighted F1
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=12.5cm]{images/test5_results_2_2_0.3.png}
+        \includegraphics[width=12.5cm]{images/test5_results_2_2_0-3.png}
         \caption{Metrics on demo test set, $V=2, n=2, \delta=0.3$}
         \label{fig:demo_2_2_0.3}
     \end{center}
 \end{figure}
 
-Once again the final model produces the highest test metrics, although the accuracy only increases slightly. In addition, its performance still isn't as good as on the original test set. A look at the per-class metrics shows that the F1 score increased on Galician tweets but decreased on the Portuguese tweets, showing the re-balancing between the two classes. 
+Once again the final model produces the highest test metrics, although the accuracy only increases slightly. In addition, its performance still isn't as good as on the original test set. A look at the per-class metrics shows that the F1 score increased on Galician tweets but decreased on the Portuguese tweets, showing the re-balancing between the two classes.
 
 \begin{table}
 	\centering
@@ -426,6 +446,11 @@ Once again the final model produces the highest test metrics, although the accur
 
 Other than that, the results seem similar to those of model 3. It is difficult to say whether or not the use of vocabulary 2 had a massive effect on the performance of the model, since model 3 seemed to have performed respectably on the original test set.
 
+
+
+\subsubsection{Model 5 - BYOM ($V=1, \delta=0.5$): }
+The BYOM model had an accuracy of 0.893, a macro F1 of 0.682, and a weighted F1 of 0.891. The per-class metrics are shown in Figure~\ref{fig:demo_BYOM}. \\
+
 \begin{figure}
     \begin{center}
         \includegraphics[width=12.5cm]{images/test5_results_BYOM.png}
@@ -434,9 +459,24 @@ Other than that, the results seem similar to those of model 3. It is difficult t
     \end{center}
 \end{figure}
 
-\newpage
+Once again, the overall global metrics on this model improved marginally compared to the trigram model. By placing some weight on the unigram and bigram models, we were able to maintain the precision metric of Galician tweets with the trigram characteristics, while slightly increasing the recall metric as well with characteristics of the bigram model.
 
-\textcolor{red}{Check in appendix for all necessary confusion matrices}
+\begin{table}
+	\centering
+	\caption{Cross tabulation of predictions (BYOM), $V=1, n=2, \delta=0.5$}
+	\label{tab:demo_confusion_BYOM}
+		\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+		& & \multicolumn{6}{c|}{Predicted} \\ \hline
+		& &  ca &   en &    es &  eu &  gl &  pt \\ \hline
+		\multirow{6}{*}{Actual} & ca   &  1071 &    7 &   305 &   0 &   0 &   8 \\
+		& en   &    22 &  342 &   116 &   0 &   0 &   3 \\
+		& es   &    19 &   44 &  4465 &   1 &  13 &  47 \\
+		& gl   &     4 &    2 &   415 &   0 &  42 &  43 \\
+		& pt   &     2 &    0 &    25 &   0 &   0 &  69 \\ \hline
+    \end{tabular}
+\end{table}
+
+\newpage
 
 \section{Team Responsibilities}
 
@@ -460,75 +500,17 @@ The breakdown of tasks were as follows:
     \end{itemize}
 \end{enumerate}
 
-\begin{thebibliography}{8}
-    
-\bibitem{ref_2}
-S.J. Russel, P. Norvig: Artificial Intelligence: A Modern Approach. 3rd edn. Pearson, Harlow (1994)
-
-\end{thebibliography}
-
 \section{Appendices}
-\subsection{Appendix A - Confusion Matrices (Given Test Dataset \code{test-tweets-given.txt})}
 
+\subsection{Appendix A - Miscellaneous Code}
 
-
-
-
-
-
-
-
-
-\begin{table}
-	\centering
-	\caption{Cross tabulation of predictions (BYOM), $V=1, n=2, \delta=0.5$}
-	\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
-		& & \multicolumn{6}{c|}{Predicted} \\ \hline
-		& &  ca &   en &    es &   eu &  gl &    pt \\ \hline
-		\multirow{6}{*}{Actual} & ca   &  51 &    1 &    23 &    0 &   0 &     0 \\
-		& en   &   3 &  406 &   102 &    2 &   0 &     3 \\
-		& es   &  11 &   16 &  3914 &    7 &   0 &    25 \\
-		& eu   &   2 &    4 &   109 &  264 &   0 &     1 \\
-		& gl   &   0 &    0 &     1 &    0 &   0 &     0 \\
-		& pt   &  17 &    9 &   412 &    0 &   2 &  1615 \\ \hline
-	\end{tabular}
-\end{table}
-
-\newpage
-
-\subsection{Appendix B - Confusion Matrices (Demo Dataset \code{test5.txt})}
-
-
-
-
-
-
-
-
-
-\begin{table}
-	\centering
-	\caption{Cross tabulation of predictions (BYOM), $V=1, n=2, \delta=0.5$}
-		\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
-		& & \multicolumn{6}{c|}{Predicted} \\ \hline
-		& &  ca &   en &    es &  eu &  gl &  pt \\ \hline
-		\multirow{6}{*}{Actual} & ca   &  1071 &    7 &   305 &   0 &   0 &   8 \\
-		& en   &    22 &  342 &   116 &   0 &   0 &   3 \\
-		& es   &    19 &   44 &  4465 &   1 &  13 &  47 \\
-		& gl   &     4 &    2 &   415 &   0 &  42 &  43 \\
-		& pt   &     2 &    0 &    25 &   0 &   0 &  69 \\ \hline
-    \end{tabular}
-\end{table}
-
-\subsection{Appendix C - Miscellaneous Code}
-
-\subsubsection{Confusion Matrix}
+\subsubsection{Confusion Matrices}
 
 \begin{lstlisting}[breaklines]
 import pandas as pd
 
 # Go through all the trace files generated during the demo.
-for file in ['trace_0_1_0.txt', 'trace_1_2_0.5.txt', 'trace_1_3_1.txt', 'trace_2_2_0.3.txt', 'trace_1_BYOM_0.5.txt']:
+for file in ['trace_0_1_0.txt', 'trace_1_2_0-5.txt', 'trace_1_3_1.txt', 'trace_2_2_0-3.txt', 'trace_1_BYOM_0-5.txt']:
     df = pd.read_csv(f'total_out/{file}', delimiter="  ", names=('id','lang','prob','pred_lang','res'))
     print(pd.crosstab(df['lang'], df['pred_lang']).to_latex())
 \end{lstlisting}
@@ -564,4 +546,3 @@ plt.ylabel('Density')
 \end{lstlisting}
 
 \end{document}
-
